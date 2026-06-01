@@ -9,24 +9,38 @@
 %%  Descripción: Simulación de respuesta para un control PI
 
 pkg load control
-clear
-clc
 
-s = tf('s');
+% Definir la planta (ejemplo: sistema de primer orden)
+% G(s) = 1 / (s + 1)
+numG = 1;
+denG = [1 1];
+G = tf(numG, denG);
 
-% Valores comerciales
-R2 = 10e3;
-R3 = 2.2e3;
-R4 = 22e3;
-C2 = 100e-9;
+% Parámetros del controlador PI
+Kp = 2;   % Ganancia proporcional
+Ki = 1;   % Ganancia integral
 
-% Controlador PI
-G = (R4/R3)*((R2*C2*s + 1)/(R2*C2*s));
+% Controlador PI: C(s) = Kp + Ki/s
+numC = [Kp, Ki];   % Numerador de C(s) = Kp + Ki/s  -> (Kp*s + Ki)/s
+denC = [1, 0];     % Denominador: s
+C = tf(numC, denC);
 
-% Mostrar función de transferencia
-G
+% Sistema en lazo cerrado
+% T(s) = (C * G) / (1 + C * G)
+T = feedback(C * G, 1);
 
-% Respuesta al escalón
-step(G)
-grid on
-title('Respuesta PI')
+% Graficar la respuesta al escalón
+figure;
+step(T);
+grid on;
+title('Respuesta al escalón del sistema de control PI');
+xlabel('Tiempo (s)');
+ylabel('Amplitud');
+
+% Mostrar información del sistema
+disp('Controlador PI:');
+disp(C);
+disp('Planta:');
+disp(G);
+disp('Sistema en lazo cerrado:');
+disp(T);
